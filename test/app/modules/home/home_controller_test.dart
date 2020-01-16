@@ -18,8 +18,8 @@ void main() {
       expect(home, isInstanceOf<HomeController>());
     });
 
-    test("insertSecretApi", () {
-      expect(home.insertSecretApi, isInstanceOf<void>());
+    test("insertSecretApi", () async {
+      expect(await home.insertSecretApi("cf3b3ef9-64dc-419f-8a2f-a255c7c5d1b6"), isInstanceOf<String>());
     });
   });
 }

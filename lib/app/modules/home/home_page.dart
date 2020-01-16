@@ -5,6 +5,7 @@ import 'package:wakatime_integration/app/modules/home/home_module.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
+
   const HomePage({Key key, this.title = "Home"}) : super(key: key);
 
   @override
@@ -12,7 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   final _homeController = HomeModule.to.getBloc<HomeController>();
   final _secretApiController = TextEditingController();
 
@@ -34,7 +34,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             RaisedButton(
-              onPressed: () => _homeController.insertSecretApi("cf3b3ef9-64dc-419f-8a2f-a255c7c5d1b6"),
+              onPressed: () {
+                _homeController.insertSecretApi(_secretApiController.text);
+                _secretApiController.clear();
+              },
               child: Text("Salvar Secret API"),
             ),
             Observer(
