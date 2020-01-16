@@ -9,32 +9,34 @@ part of 'home_controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$HomeController on _HomeBase, Store {
-  final _$valueAtom = Atom(name: '_HomeBase.value');
+  Computed<String> _$getUserComputed;
 
   @override
-  int get value {
-    _$valueAtom.context.enforceReadPolicy(_$valueAtom);
-    _$valueAtom.reportObserved();
-    return super.value;
+  String get getUser =>
+      (_$getUserComputed ??= Computed<String>(() => super.getUser)).value;
+
+  final _$emailAtom = Atom(name: '_HomeBase.email');
+
+  @override
+  String get email {
+    _$emailAtom.context.enforceReadPolicy(_$emailAtom);
+    _$emailAtom.reportObserved();
+    return super.email;
   }
 
   @override
-  set value(int value) {
-    _$valueAtom.context.conditionallyRunInAction(() {
-      super.value = value;
-      _$valueAtom.reportChanged();
-    }, _$valueAtom, name: '${_$valueAtom.name}_set');
+  set email(String value) {
+    _$emailAtom.context.conditionallyRunInAction(() {
+      super.email = value;
+      _$emailAtom.reportChanged();
+    }, _$emailAtom, name: '${_$emailAtom.name}_set');
   }
 
-  final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
+  final _$insertSecretApiAsyncAction = AsyncAction('insertSecretApi');
 
   @override
-  void increment() {
-    final _$actionInfo = _$_HomeBaseActionController.startAction();
-    try {
-      return super.increment();
-    } finally {
-      _$_HomeBaseActionController.endAction(_$actionInfo);
-    }
+  Future<String> insertSecretApi(String _secretApi) {
+    return _$insertSecretApiAsyncAction
+        .run(() => super.insertSecretApi(_secretApi));
   }
 }

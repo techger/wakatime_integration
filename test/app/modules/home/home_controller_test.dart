@@ -10,7 +10,7 @@ void main() {
   HomeController home;
 
   setUp(() {
-    home = HomeModule.to.get<HomeController>();
+    home = HomeModule.to.getBloc<HomeController>();
   });
 
   group('HomeController Test', () {
@@ -18,10 +18,8 @@ void main() {
       expect(home, isInstanceOf<HomeController>());
     });
 
-    test("Set Value", () {
-      expect(home.value, equals(0));
-      home.increment();
-      expect(home.value, equals(1));
+    test("insertSecretApi", () {
+      expect(home.insertSecretApi, isInstanceOf<void>());
     });
   });
 }

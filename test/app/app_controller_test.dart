@@ -10,7 +10,7 @@ void main() {
   AppController app;
 
   setUp(() {
-    app = AppModule.to.get<AppController>();
+    app = AppModule.to.getBloc<AppController>();
   });
 
   group('AppController Test', () {
