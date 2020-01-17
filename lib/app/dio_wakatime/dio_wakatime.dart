@@ -17,7 +17,7 @@ class DioWakatime {
 
   Future<Response> get(String path, String _secretApiKey) async {
     final Dio dio = initDio(_secretApiKey);
-    final Response _response = await dio.get(path);
+    final Response _response = await dio?.get(path);
     return _response;
   }
 }

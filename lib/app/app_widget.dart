@@ -8,7 +8,13 @@ class AppWidget extends StatelessWidget {
       title: 'DoutTime',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
+        primaryIconTheme: IconThemeData(
+          color: Colors.white
+        ),
+        primaryTextTheme: TextTheme(
+          title: TextStyle(color: Colors.white, fontSize: 15.0),
+        ),
       ),
       home: HomeModule(),
     );

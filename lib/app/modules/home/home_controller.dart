@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wakatime_integration/app/dio_wakatime/dio_wakatime.dart';
+import 'package:wakatime_integration/app/models/user.dart';
 import 'package:wakatime_integration/app/modules/home/home_module.dart';
 
 part 'home_controller.g.dart';
@@ -11,17 +14,54 @@ abstract class _HomeBase with Store {
   final DioWakatime dio = HomeModule.to.getDependency<DioWakatime>();
 
   @observable
-  String email = "";
+  User user;
+
+  @observable
+  bool isLoading = false;
+
+  @observable
+  bool persistUserInBox = false;
+
+  @observable
+  bool appBarColor;
 
   @action
-  Future<String> insertSecretApi(String _secretApi) async {
+  Future<User> insertSecretApi(String _secretApi) async {
     if (_secretApi.isNotEmpty) {
-      final Response _response = await dio.get('/users/current', _secretApi);
-      email = _response.data['data']['email'];
+      isLoading = true;
+      final Response _response = await dio?.get('/users/current', _secretApi);
+      isLoading = false;
+      user = User.fromJson(_response.data['data']);
     }
-    return "";
+    return user;
   }
 
+  @action
+  void userAnotherAccount() {
+    user = null;
+    persistUserInBox = false;
+    appBarColor = false;
+    appBarColorDefault();
+  }
+
+  @action
+  void persistUser() {
+    persistUserInBox = true;
+    appBarColor = true;
+    appBarColorDefault();
+  }
+
+  @action
+  void appBarColorDefault() => Timer(Duration(seconds: 6), () {
+    appBarColor = null;
+  });
+
   @computed
-  String get getUser => email;
+  bool get isPersistUser => persistUserInBox;
+
+  @computed
+  bool get isSearchWakatimeUser => isLoading;
+
+  @computed
+  String get getMessageWelcome => "Seja bem vindo ${user.email}";
 }
