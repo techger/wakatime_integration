@@ -45,6 +45,23 @@ mixin _$HomeController on _HomeBase, Store {
     }, _$userAtom, name: '${_$userAtom.name}_set');
   }
 
+  final _$loggedUserAtom = Atom(name: '_HomeBase.loggedUser');
+
+  @override
+  User get loggedUser {
+    _$loggedUserAtom.context.enforceReadPolicy(_$loggedUserAtom);
+    _$loggedUserAtom.reportObserved();
+    return super.loggedUser;
+  }
+
+  @override
+  set loggedUser(User value) {
+    _$loggedUserAtom.context.conditionallyRunInAction(() {
+      super.loggedUser = value;
+      _$loggedUserAtom.reportChanged();
+    }, _$loggedUserAtom, name: '${_$loggedUserAtom.name}_set');
+  }
+
   final _$isLoadingAtom = Atom(name: '_HomeBase.isLoading');
 
   @override
@@ -104,6 +121,28 @@ mixin _$HomeController on _HomeBase, Store {
         .run(() => super.insertSecretApi(_secretApi));
   }
 
+  final _$launchSecretApiKeyAsyncAction = AsyncAction('launchSecretApiKey');
+
+  @override
+  Future<void> launchSecretApiKey() {
+    return _$launchSecretApiKeyAsyncAction
+        .run(() => super.launchSecretApiKey());
+  }
+
+  final _$saveUserInHiveAsyncAction = AsyncAction('saveUserInHive');
+
+  @override
+  Future<dynamic> saveUserInHive() {
+    return _$saveUserInHiveAsyncAction.run(() => super.saveUserInHive());
+  }
+
+  final _$checkIfLoggedUserAsyncAction = AsyncAction('checkIfLoggedUser');
+
+  @override
+  Future<void> checkIfLoggedUser() {
+    return _$checkIfLoggedUserAsyncAction.run(() => super.checkIfLoggedUser());
+  }
+
   final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
 
   @override
@@ -111,16 +150,6 @@ mixin _$HomeController on _HomeBase, Store {
     final _$actionInfo = _$_HomeBaseActionController.startAction();
     try {
       return super.userAnotherAccount();
-    } finally {
-      _$_HomeBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void persistUser() {
-    final _$actionInfo = _$_HomeBaseActionController.startAction();
-    try {
-      return super.persistUser();
     } finally {
       _$_HomeBaseActionController.endAction(_$actionInfo);
     }

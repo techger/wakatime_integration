@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:wakatime_integration/app/models/user.dart';
@@ -18,7 +19,22 @@ class _HomePageState extends State<HomePage> {
   final _homeController = HomeModule.to.getBloc<HomeController>();
   final _secretApiController = TextEditingController();
 
-  Widget buildWelcome(User user) {
+  @override
+  initState() {
+    _homeController.checkIfLoggedUser();
+    super.initState();
+  }
+
+  Widget buildLoggedUser() {
+    return Center(
+      child: Text(
+        _homeController.getMessageWelcome,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget buildCardWithUser(User user) {
     return Center(
       child: Card(
         child: Container(
@@ -39,7 +55,8 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     FlatButton(
                       child: Text("Utilizar esta conta ?"),
-                      onPressed: _homeController.persistUser,
+                      onPressed: () async =>
+                          await _homeController.saveUserInHive(),
                     ),
                     FlatButton(
                       child: Text("Usar outra conta ?"),
@@ -56,12 +73,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildNotContent() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: !_homeController.isLoading
-              ? TextField(
+    return !_homeController.isLoading
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
                   controller: _secretApiController,
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
@@ -73,13 +91,21 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     border: OutlineInputBorder(),
-                    labelText: 'Secret API',
+                    labelText: 'Secret API Key',
                   ),
-                )
-              : Center(child: circularProgressIndicator()),
-        ),
-      ],
-    );
+                ),
+              ),
+              GestureDetector(
+                onTap: () async => await _homeController.launchSecretApiKey(),
+                child: Text(
+                  "Acesse sua key",
+                  style: TextStyle(decoration: TextDecoration.underline),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          )
+        : Center(child: circularProgressIndicator());
   }
 
   @override
@@ -90,7 +116,8 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: _homeController.appBarColor == null
               ? null
               : _homeController.appBarColor ? Colors.green : Colors.redAccent,
-          title: Text("Home"),
+          title: Text("Dout Time"),
+          centerTitle: true,
           actions: <Widget>[
             Center(
               child: Padding(
@@ -98,8 +125,8 @@ class _HomePageState extends State<HomePage> {
                 child: Observer(
                   builder: (_) => CircleAvatar(
                     radius: _homeController.isPersistUser ? 15.0 : 0.0,
-                    backgroundImage: _homeController.user?.photo != null
-                        ? NetworkImage(_homeController.user?.photo)
+                    backgroundImage: _homeController.loggedUser?.photo != null
+                        ? NetworkImage(_homeController.loggedUser.photo)
                         : null,
                   ),
                 ),
@@ -108,9 +135,13 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         body: Observer(
-          builder: (_) => _homeController.user != null
-              ? buildWelcome(_homeController.user)
-              : buildNotContent(),
+          builder: (_) => _homeController.loggedUser != null
+              ? buildLoggedUser()
+              : Observer(
+                  builder: (_) => _homeController.user != null
+                      ? buildCardWithUser(_homeController.user)
+                      : buildNotContent(),
+                ),
         ),
       ),
     );
