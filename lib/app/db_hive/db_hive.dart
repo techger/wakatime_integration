@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakatime_integration/app/models/user.dart';
@@ -17,6 +15,11 @@ class DbHive {
     final Box _box = await this.initBox();
     _box.put('user', _user.toJson());
     return _user;
+  }
+
+  Future<void> deleteUser() async {
+    final Box _box = await this.initBox();
+    await _box.delete('user');
   }
 
   Future<User> getUser() async {

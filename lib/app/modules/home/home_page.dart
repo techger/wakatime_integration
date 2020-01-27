@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:wakatime_integration/app/graphic/graphic_module.dart';
+import 'package:wakatime_integration/app/graphic/graphic_page.dart';
+import 'package:wakatime_integration/app/graphic_firebase/graphic_firebase_module.dart';
 import 'package:wakatime_integration/app/models/user.dart';
 import 'package:wakatime_integration/app/modules/home/home_controller.dart';
 import 'package:wakatime_integration/app/modules/home/home_module.dart';
+import 'package:wakatime_integration/app/settings/settings_module.dart';
+import 'package:wakatime_integration/app/settings/settings_page.dart';
 import 'package:wakatime_integration/app/widgets/progress_indicator.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _homeController = HomeModule.to.getBloc<HomeController>();
   final _secretApiController = TextEditingController();
+  final _pageController = PageController();
 
   @override
   initState() {
@@ -26,11 +32,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildLoggedUser() {
-    return Center(
-      child: Text(
-        _homeController.getMessageWelcome,
-        textAlign: TextAlign.center,
-      ),
+    return PageView(
+      physics: NeverScrollableScrollPhysics(),
+      onPageChanged: _homeController.onPageChanged,
+      controller: _pageController,
+      children: <Widget>[
+        GraphicModule(),
+        GraphicFirebaseModule(),
+        SettingsModule(),
+      ],
     );
   }
 
@@ -73,7 +83,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildNotContent() {
-    return !_homeController.isLoading
+    return !_homeController.isLoading && !_homeController.isLoadingLoggedUser
         ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -108,6 +118,32 @@ class _HomePageState extends State<HomePage> {
         : Center(child: circularProgressIndicator());
   }
 
+  Widget _buildBottomAppBar() {
+    return Observer(
+      builder: (_) => CupertinoTabBar(
+        onTap: _changedPageView,
+        currentIndex: _homeController.getCurrentIndexOnPageView,
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.whatshot, size: 40.0),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _changedPageView(int index) => _pageController.animateToPage(
+        index,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.bounceOut,
+      );
+
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -123,11 +159,14 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: Observer(
-                  builder: (_) => CircleAvatar(
-                    radius: _homeController.isPersistUser ? 15.0 : 0.0,
-                    backgroundImage: _homeController.loggedUser?.photo != null
-                        ? NetworkImage(_homeController.loggedUser.photo)
-                        : null,
+                  builder: (_) => GestureDetector(
+                    onTap: () async => await _homeController.logout(),
+                    child: CircleAvatar(
+                      radius: _homeController.isPersistUser ? 15.0 : 0.0,
+                      backgroundImage: _homeController.loggedUser != null
+                          ? NetworkImage(_homeController.loggedUser.photo)
+                          : null,
+                    ),
                   ),
                 ),
               ),
@@ -143,6 +182,7 @@ class _HomePageState extends State<HomePage> {
                       : buildNotContent(),
                 ),
         ),
+        bottomNavigationBar: _buildBottomAppBar(),
       ),
     );
   }

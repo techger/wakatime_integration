@@ -24,6 +24,9 @@ abstract class _HomeBase with Store {
   User loggedUser;
 
   @observable
+  bool isLoadingLoggedUser = false;
+
+  @observable
   bool isLoading = false;
 
   @observable
@@ -32,12 +35,19 @@ abstract class _HomeBase with Store {
   @observable
   bool appBarColor;
 
+  @observable
+  int positionPageView = 0;
+
+  @action
+  void onPageChanged(int index) => positionPageView = index;
+
   @action
   Future<User> insertSecretApi(String _secretApi) async {
     if (_secretApi.isNotEmpty) {
       isLoading = true;
       final Response _response = await dio?.get('/users/current', _secretApi);
       isLoading = false;
+      _response.data['data']['apiKey'] = _secretApi;
       user = User.fromJson(_response.data['data']);
     }
     return user;
@@ -79,10 +89,22 @@ abstract class _HomeBase with Store {
 
   @action
   Future<void> checkIfLoggedUser() async {
+    isLoadingLoggedUser = true;
     loggedUser = await dbHive.getUser();
     if (loggedUser != null) {
       persistUserInBox = true;
     }
+    isLoadingLoggedUser = false;
+  }
+
+  @action
+  Future<void> logout() async {
+    isLoading = true;
+    await dbHive.deleteUser();
+    loggedUser = null;
+    user = null;
+    persistUserInBox = false;
+    isLoading = false;
   }
 
   @computed
@@ -93,4 +115,8 @@ abstract class _HomeBase with Store {
 
   @computed
   String get getMessageWelcome => "Seja bem vindo ${loggedUser.email} ao DoutTime";
+
+  @computed
+  int get getCurrentIndexOnPageView => positionPageView;
+
 }

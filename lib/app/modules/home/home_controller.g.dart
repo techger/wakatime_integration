@@ -27,6 +27,12 @@ mixin _$HomeController on _HomeBase, Store {
   String get getMessageWelcome => (_$getMessageWelcomeComputed ??=
           Computed<String>(() => super.getMessageWelcome))
       .value;
+  Computed<int> _$getCurrentIndexOnPageViewComputed;
+
+  @override
+  int get getCurrentIndexOnPageView => (_$getCurrentIndexOnPageViewComputed ??=
+          Computed<int>(() => super.getCurrentIndexOnPageView))
+      .value;
 
   final _$userAtom = Atom(name: '_HomeBase.user');
 
@@ -60,6 +66,25 @@ mixin _$HomeController on _HomeBase, Store {
       super.loggedUser = value;
       _$loggedUserAtom.reportChanged();
     }, _$loggedUserAtom, name: '${_$loggedUserAtom.name}_set');
+  }
+
+  final _$isLoadingLoggedUserAtom = Atom(name: '_HomeBase.isLoadingLoggedUser');
+
+  @override
+  bool get isLoadingLoggedUser {
+    _$isLoadingLoggedUserAtom.context
+        .enforceReadPolicy(_$isLoadingLoggedUserAtom);
+    _$isLoadingLoggedUserAtom.reportObserved();
+    return super.isLoadingLoggedUser;
+  }
+
+  @override
+  set isLoadingLoggedUser(bool value) {
+    _$isLoadingLoggedUserAtom.context.conditionallyRunInAction(() {
+      super.isLoadingLoggedUser = value;
+      _$isLoadingLoggedUserAtom.reportChanged();
+    }, _$isLoadingLoggedUserAtom,
+        name: '${_$isLoadingLoggedUserAtom.name}_set');
   }
 
   final _$isLoadingAtom = Atom(name: '_HomeBase.isLoading');
@@ -113,6 +138,23 @@ mixin _$HomeController on _HomeBase, Store {
     }, _$appBarColorAtom, name: '${_$appBarColorAtom.name}_set');
   }
 
+  final _$positionPageViewAtom = Atom(name: '_HomeBase.positionPageView');
+
+  @override
+  int get positionPageView {
+    _$positionPageViewAtom.context.enforceReadPolicy(_$positionPageViewAtom);
+    _$positionPageViewAtom.reportObserved();
+    return super.positionPageView;
+  }
+
+  @override
+  set positionPageView(int value) {
+    _$positionPageViewAtom.context.conditionallyRunInAction(() {
+      super.positionPageView = value;
+      _$positionPageViewAtom.reportChanged();
+    }, _$positionPageViewAtom, name: '${_$positionPageViewAtom.name}_set');
+  }
+
   final _$insertSecretApiAsyncAction = AsyncAction('insertSecretApi');
 
   @override
@@ -143,7 +185,24 @@ mixin _$HomeController on _HomeBase, Store {
     return _$checkIfLoggedUserAsyncAction.run(() => super.checkIfLoggedUser());
   }
 
+  final _$logoutAsyncAction = AsyncAction('logout');
+
+  @override
+  Future<void> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
+  }
+
   final _$_HomeBaseActionController = ActionController(name: '_HomeBase');
+
+  @override
+  void onPageChanged(int index) {
+    final _$actionInfo = _$_HomeBaseActionController.startAction();
+    try {
+      return super.onPageChanged(index);
+    } finally {
+      _$_HomeBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void userAnotherAccount() {
