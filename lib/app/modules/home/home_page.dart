@@ -1,14 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:wakatime_integration/app/graphic/graphic_module.dart';
-import 'package:wakatime_integration/app/graphic/graphic_page.dart';
 import 'package:wakatime_integration/app/graphic_firebase/graphic_firebase_module.dart';
 import 'package:wakatime_integration/app/models/user.dart';
 import 'package:wakatime_integration/app/modules/home/home_controller.dart';
 import 'package:wakatime_integration/app/modules/home/home_module.dart';
 import 'package:wakatime_integration/app/settings/settings_module.dart';
-import 'package:wakatime_integration/app/settings/settings_page.dart';
 import 'package:wakatime_integration/app/widgets/progress_indicator.dart';
 
 class HomePage extends StatefulWidget {
@@ -148,31 +147,44 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) => Scaffold(
-        appBar: AppBar(
-          backgroundColor: _homeController.appBarColor == null
-              ? null
-              : _homeController.appBarColor ? Colors.green : Colors.redAccent,
-          title: Text("Dout Time"),
-          centerTitle: true,
-          actions: <Widget>[
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Observer(
-                  builder: (_) => GestureDetector(
-                    onTap: () async => await _homeController.logout(),
-                    child: CircleAvatar(
-                      radius: _homeController.isPersistUser ? 15.0 : 0.0,
-                      backgroundImage: _homeController.loggedUser != null
-                          ? NetworkImage(_homeController.loggedUser.photo)
-                          : null,
-                    ),
-                  ),
-                ),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(AppBar().preferredSize.height),
+          child: AnimatedContainer(
+            curve: Curves.easeInOutBack,
+            duration: Duration(seconds: 1),
+            color: _homeController.appBarColor == null
+                ? Theme.of(context).primaryColor
+                : _homeController.appBarColor ? Colors.green : Colors.redAccent,
+            child: Center(
+              child: Text(
+                'Dout Time',
+                style: TextStyle(color: Colors.white, fontSize: 15.0),
               ),
             ),
-          ],
+          ),
         ),
+//        AppBar(
+//          backgroundColor: _homeController.appBarColor == null
+//              ? null
+//              : _homeController.appBarColor ? Colors.green : Colors.redAccent,
+//          title: Text("Dout Time"),
+//          centerTitle: true,
+//          actions: <Widget>[
+//            Center(
+//              child: Padding(
+//                padding: const EdgeInsets.only(right: 8.0),
+//                child: Observer(
+//                  builder: (_) => CircleAvatar(
+//                    radius: _homeController.isPersistUser ? 15.0 : 0.0,
+//                    backgroundImage: _homeController.loggedUser != null
+//                        ? NetworkImage(_homeController.loggedUser.photo)
+//                        : null,
+//                  ),
+//                ),
+//              ),
+//            ),
+//          ],
+//        ),
         body: Observer(
           builder: (_) => _homeController.loggedUser != null
               ? buildLoggedUser()
@@ -182,7 +194,8 @@ class _HomePageState extends State<HomePage> {
                       : buildNotContent(),
                 ),
         ),
-        bottomNavigationBar: _buildBottomAppBar(),
+        bottomNavigationBar:
+            _homeController.loggedUser != null ? _buildBottomAppBar() : null,
       ),
     );
   }

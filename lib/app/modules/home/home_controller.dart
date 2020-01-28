@@ -105,6 +105,7 @@ abstract class _HomeBase with Store {
     user = null;
     persistUserInBox = false;
     isLoading = false;
+    positionPageView = 0;
   }
 
   @computed
